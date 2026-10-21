@@ -1,0 +1,289 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <!-- Created by TCHAKOU Tam / Optimized with Avatar Gallery Picker -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>PaulinChat@</title>
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/logo.png') }}">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            color: #333;
+            display: flex;
+            height: 100vh;
+            background: linear-gradient(135deg, #f0f2f5 0%, #cbebff 100%);
+            background-attachment: fixed;
+        }
+
+        /* ─── APP LAYOUT STRUCTURE ─── */
+        .sidebar {
+            width: 280px;
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            border-right: 1px solid rgba(227, 230, 234, 0.8);
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .main-chat {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            max-width: 800px;
+            margin: 0 auto;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        /* ─── LANGUAGE SWITCHER BUTTONS ─── */
+        .language-wrapper {
+            display: flex;
+            gap: 5px;
+            margin-bottom: 15px;
+        }
+        .lang-btn {
+            flex: 1;
+            padding: 6px;
+            font-size: 12px;
+            background-color: #e4e6eb;
+            color: #333;
+            border: 1px solid #ccd0d5;
+            cursor: pointer;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+        .lang-btn.active {
+            background-color: #0c66e4;
+            color: white;
+            border-color: #0c66e4;
+        }
+
+        /* ─── AVATAR GALLERY PICKER ─── */
+        .avatar-picker-title {
+            font-weight: 600;
+            color: #4b5563;
+            font-size: 13px;
+            margin-bottom: 5px;
+            display: block;
+        }
+        .avatar-gallery {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 12px;
+            overflow-x: auto;
+            padding: 4px 0;
+        }
+        .avatar-option {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: all 0.2s ease;
+            object-fit: cover;
+        }
+        .avatar-option:hover {
+            transform: scale(1.1);
+        }
+        .avatar-option.selected {
+            border-color: #0c66e4;
+            box-shadow: 0 0 8px rgba(12, 102, 228, 0.5);
+        }
+
+        /* ─── SIDEBAR & GROUPS ─── */
+        .sidebar h3 { color: #0c66e4; margin-top: 20px; margin-bottom: 10px; }
+
+        .group-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            overflow-y: auto;
+            flex-grow: 1;
+        }
+
+        .group-item {
+            padding: 12px;
+            background: white;
+            margin-bottom: 8px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            border: 1px solid #ccd0d5;
+            transition: all 0.2s;
+        }
+
+        .group-item:hover, .group-item.active {
+            background-color: #0c66e4;
+            color: white;
+            border-color: #0c66e4;
+        }
+
+        .profile-section, .group-creation-section {
+            background: white;
+            padding: 12px;
+            border-radius: 8px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+            margin-bottom: 15px;
+        }
+
+        /* ─── MESSAGES & CHAT AREA ─── */
+        h1 { color: #0c66e4; margin: 0 0 5px 0; }
+
+        #messages {
+            list-style-type: none;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(10px);
+            flex-grow: 1;
+            overflow-y: auto;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            margin-bottom: 20px;
+            border: 1px solid rgba(227, 230, 234, 0.5);
+        }
+
+        .message-wrapper {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            margin: 12px 0;
+        }
+
+        .message-avatar {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 1px solid #ccd0d5;
+        }
+
+        .message-content {
+            background-color: #e4e6eb;
+            padding: 10px 14px;
+            border-radius: 18px;
+            max-width: 75%;
+            word-wrap: break-word;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        }
+
+        .message-username {
+            font-size: 12px;
+            font-weight: bold;
+            color: #555;
+            margin-bottom: 3px;
+        }
+
+        /* ─── FORMS & INPUTS ─── */
+        form {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(10px);
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            border: 1px solid rgba(227, 230, 234, 0.5);
+        }
+
+        input[type="text"], input[type="file"] {
+            flex-grow: 1;
+            padding: 10px;
+            border: 1px solid #ccd0d5;
+            border-radius: 6px;
+            font-size: 14px;
+            outline: none;
+            background: white;
+        }
+
+        button {
+            padding: 10px 20px;
+            background-color: #0c66e4;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        button:hover { background-color: #0055cc; }
+        .btn-mic { background-color: #25d366; }
+        .btn-mic:hover { background-color: #20ba5a; }
+        .recording { background-color: #dc3545 !important; animation: blink 1s infinite; }
+
+        img, video, audio {
+            display: block;
+            max-width: 100%;
+            margin-top: 8px;
+            border-radius: 6px;
+        }
+
+        @keyframes blink { 50% { opacity: 0.6; } }
+        label { font-weight: 600; color: #4b5563; font-size: 13px; }
+    </style>
+</head>
+<body>
+
+    <!-- SIDEBAR FOR GROUPS & PROFILE -->
+    <div class="sidebar">
+        <!-- Language Switch Panel -->
+        <div class="language-wrapper">
+            <button class="lang-btn active" onclick="changeLanguage('en')">EN 🇬🇧</button>
+            <button class="lang-btn" onclick="changeLanguage('fr')">FR 🇫🇷</button>
+        </div>
+
+        <!-- Profile Setup -->
+        <div class="profile-section">
+            <label id="ui-username" for="username">Username:</label>
+            <input type="text" id="username" maxlength="20" value="Anonymous" style="margin-bottom: 8px; width: 100%; box-sizing: border-box;">
+
+            <!-- Clickable Visual Avatar Picker -->
+            <span id="ui-avatar" class="avatar-picker-title">Select your Avatar:</span>
+            <div class="avatar-gallery">
+                <!-- Using placeholder images that simulate pre-hosted student avatar options -->
+                <img src="https://dicebear.com" class="avatar-option selected" onclick="selectAvatar(this)" alt="Avatar 1">
+                <img src="https://dicebear.com" class="avatar-option" onclick="selectAvatar(this)" alt="Avatar 2">
+                <img src="https://dicebear.com" class="avatar-option" onclick="selectAvatar(this)" alt="Avatar 3">
+                <img src="https://dicebear.com" class="avatar-option" onclick="selectAvatar(this)" alt="Avatar 4">
+            </div>
+
+            <button id="save-profile-btn" style="width: 100%; margin-top: 4px; padding: 6px;">Save Profile</button>
+        </div>
+
+        <!-- Create Group -->
+        <div class="group-creation-section">
+            <label id="ui-create-group" for="new-group-name">Create New Group:</label>
+            <input type="text" id="new-group-name" placeholder="Group Name..." style="width: 100%; box-sizing: border-box; margin-bottom: 8px;">
+            <button id="create-group-btn" style="width: 100%; padding: 6px; background-color: #25d366;">Create</button>
+        </div>
+
+        <h3 id="ui-chat-groups">💬 Chat Groups</h3>
+        <ul id="group-list" class="group-list"></ul>
+    </div>
+
+    <!-- MAIN CHAT CONTAINER -->
+    <div class="main-chat">
+        <h1>💬 <span id="ui-welcome">Welcome to PaulinChat@</span> (<span id="active-group-display">General</span>)</h1>
+        <p style="color: #666; font-style: italic; margin-top: -5px; margin-bottom: 20px;">Created by Paulin Tam</p>
+
+        <ul id="messages"></ul>
+
+        <!-- Text Form + Voice Recording Button -->
+        <form id="chat-form">
+            <input type="text" id="message" maxlength="500" placeholder="Write a message..." required>
+            <button type="button" id="mic-btn" class="btn-mic">🎙️ Record</button>
+            <button type="submit" id="ui-send-btn">Send</button>
+        </form>
+
+        <!-- File Form -->
+        <form id="file-form" enctype="multipart/form-data">
+            <div style="flex-grow: 1; display: flex; flex-direction: column; gap: 5px;">
+                <label id="ui-send-file" for="file">Send a file to this group:</label>
+                <input id="file" type="file" accept=".jpg,.jpeg,.png,.webp,.mp4,.webm,.pdf" required>
+            </div>
